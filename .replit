@@ -1,0 +1,37 @@
+modules = ["nodejs-20"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["cargo"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Rust Arbitrage Bot"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "rust_build"
+
+[[workflows.workflow]]
+name = "Rust Arbitrage Bot"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cargo run"
+
+[[workflows.workflow]]
+name = "rust_build"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /tmp && git clone /tmp/project . && cd project && cargo build --release && echo \"Build completed successfully\""
