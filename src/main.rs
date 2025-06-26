@@ -107,7 +107,7 @@ async fn monitor_arbitrage_opportunities(config: &Config) -> anyhow::Result<u32>
 }
 
 async fn simulate_price_check() -> anyhow::Result<f64> {
-    // Simulate price difference between DEXes
+    // Simulate realistic price checking with displayed prices
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -116,8 +116,19 @@ async fn simulate_price_check() -> anyhow::Result<f64> {
     SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs().hash(&mut hasher);
     let random_value = hasher.finish();
     
-    // Generate a small random price difference (usually less than threshold)
-    let price_diff = (random_value % 100) as f64 / 10000.0; // 0-0.99%
+    // Simulate realistic ETH/USDC prices (around $3400)
+    let base_price = 3400.0;
+    let uniswap_price = base_price + ((random_value % 20) as f64 - 10.0); // ±$10 variation
+    let sushiswap_price = base_price + (((random_value >> 8) % 20) as f64 - 10.0); // ±$10 variation
     
-    Ok(price_diff)
+    // Calculate price difference percentage
+    let price_diff = ((uniswap_price - sushiswap_price).abs() / base_price) * 100.0;
+    let profit_percentage = price_diff / 100.0; // Convert to decimal
+    
+    // Log the prices for visibility
+    info!("   💰 Uniswap V2 ETH/USDC: ${:.2}", uniswap_price);
+    info!("   💰 SushiSwap ETH/USDC: ${:.2}", sushiswap_price);
+    info!("   📊 Price difference: {:.4}% (threshold: 1.00%)", price_diff);
+    
+    Ok(profit_percentage)
 }
