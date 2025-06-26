@@ -15,9 +15,7 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: process.env.INFURA_API_KEY.includes('https://') ? 
-           process.env.INFURA_API_KEY : 
-           `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      url: process.env.ETHEREUM_RPC_URL,
       accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace('0x', '')}`] : [],
       gasPrice: 10000000000, // 10 gwei
       chainId: 11155111
