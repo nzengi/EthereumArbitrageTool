@@ -4,35 +4,24 @@ require("dotenv").config();
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.19",
+    version: "0.8.20",
     settings: {
       optimizer: {
         enabled: true,
         runs: 200,
       },
+      viaIR: true,
     },
   },
   networks: {
-    mainnet: {
-      url: process.env.ETH_HTTP_RPC_URL || "https://mainnet.infura.io/v3/YOUR_API_KEY",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 30000000000, // 30 gwei
-    },
-    goerli: {
-      url: process.env.GOERLI_RPC_URL || "https://goerli.infura.io/v3/YOUR_API_KEY",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 10000000000, // 10 gwei
-    },
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://sepolia.infura.io/v3/YOUR_API_KEY",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace('0x', '')}`] : [],
       gasPrice: 10000000000, // 10 gwei
+      chainId: 11155111
     },
     hardhat: {
-      forking: {
-        url: process.env.ETH_HTTP_RPC_URL || "https://mainnet.infura.io/v3/YOUR_API_KEY",
-        blockNumber: 18500000, // Optional: pin to specific block
-      },
+      chainId: 31337
     },
   },
   etherscan: {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -86,7 +86,7 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
         _;
     }
 
-    constructor(address _lendingPool, address _feeCollector) {
+    constructor(address _lendingPool, address _feeCollector) Ownable(msg.sender) {
         require(_lendingPool != address(0), "Invalid lending pool address");
         require(_feeCollector != address(0), "Invalid fee collector address");
         LENDING_POOL = ILendingPool(_lendingPool);
@@ -165,7 +165,7 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
         }
         
         // Approve lending pool to pull the debt amount
-        IERC20(assets[0]).safeApprove(address(LENDING_POOL), totalDebt);
+        IERC20(assets[0]).approve(address(LENDING_POOL), totalDebt);
         
         emit ArbitrageExecuted(
             arbitrageParams.tokenIn,
@@ -252,7 +252,7 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
     ) internal returns (uint256) {
         IUniswapV2Router router = IUniswapV2Router(UNISWAP_V2_ROUTER);
         
-        IERC20(tokenIn).safeApprove(UNISWAP_V2_ROUTER, amountIn);
+        IERC20(tokenIn).approve(UNISWAP_V2_ROUTER, amountIn);
         
         uint256[] memory amountsOut = router.getAmountsOut(amountIn, path);
         uint256 amountOutMin = amountsOut[1] * 995 / 1000; // 0.5% slippage tolerance
@@ -279,7 +279,7 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
     ) internal returns (uint256) {
         ISushiSwapRouter router = ISushiSwapRouter(SUSHISWAP_ROUTER);
         
-        IERC20(tokenIn).safeApprove(SUSHISWAP_ROUTER, amountIn);
+        IERC20(tokenIn).approve(SUSHISWAP_ROUTER, amountIn);
         
         uint256[] memory amountsOut = router.getAmountsOut(amountIn, path);
         uint256 amountOutMin = amountsOut[1] * 995 / 1000; // 0.5% slippage tolerance
