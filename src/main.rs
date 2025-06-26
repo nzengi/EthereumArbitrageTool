@@ -116,8 +116,8 @@ async fn simulate_price_check() -> anyhow::Result<f64> {
     SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs().hash(&mut hasher);
     let random_value = hasher.finish();
     
-    // Simulate realistic ETH/USDC prices (around $3400)
-    let base_price = 3400.0;
+    // Simulate realistic ETH/USDC prices (around $2440)
+    let base_price = 2440.0;
     let uniswap_price = base_price + ((random_value % 20) as f64 - 10.0); // ±$10 variation
     let sushiswap_price = base_price + (((random_value >> 8) % 20) as f64 - 10.0); // ±$10 variation
     
