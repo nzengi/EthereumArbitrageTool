@@ -111,7 +111,12 @@ Flash Loan Request → Borrow Assets → Buy on Cheaper DEX → Sell on Expensiv
 - **Slippage Protection**: Configurable maximum slippage limits
 
 ## Changelog
-- June 26, 2025. Initial setup
+- June 26, 2025: Initial setup
+- June 26, 2025: Configured for Sepolia testnet with fee collection
+  - Added fee collector address: 0x5Cd87281B8Aec278136f1bC41173fBC69b1c0670
+  - Removed Curve and Balancer DEX support for testnet compatibility
+  - Updated smart contract with 0.1% fee mechanism
+  - Configured USDC and WETH addresses for Sepolia testnet
 
 ## User Preferences
 

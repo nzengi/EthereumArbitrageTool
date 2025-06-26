@@ -97,14 +97,14 @@ impl Config {
                     .parse()?,
                 trading_pairs: vec![
                     TradingPair {
-                        token0: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2".to_string(), // WETH
-                        token1: "0xA0b86a33E6417bC00C6F6B1C1D19c9b80a8d57D4".to_string(), // USDC real mainnet
+                        token0: "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9".to_string(), // WETH Sepolia
+                        token1: "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8".to_string(), // USDC Sepolia
                         symbol: "ETH/USDC".to_string(),
                     }
                 ],
             },
             flashloan: FlashLoanConfig {
-                aave_pool_address: "0x87870Bca0Ce32Ac2e4e1d8F8a6F07e4Fb78c7c38".to_string(), // Aave V3
+                aave_pool_address: "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A".to_string(), // Aave V3 Sepolia
                 contract_address: env::var("FLASHLOAN_CONTRACT_ADDRESS")
                     .unwrap_or_else(|_| "0x0000000000000000000000000000000000000000".to_string()),
                 max_loan_amount_eth: env::var("MAX_LOAN_AMOUNT_ETH")

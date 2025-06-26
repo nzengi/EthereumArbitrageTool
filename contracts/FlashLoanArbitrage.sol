@@ -49,14 +49,18 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
     ILendingPool public immutable LENDING_POOL;
+    address public immutable FEE_COLLECTOR;
     
-    // DEX Router addresses
+    // DEX Router addresses (Sepolia Testnet)
     address public constant UNISWAP_V2_ROUTER = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address public constant SUSHISWAP_ROUTER = 0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F;
     
-    // Common tokens
-    address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    address public constant USDC = 0xA0b86a33E6417bC00C6F6B1C1D19c9b80a8d57D4;
+    // Common tokens (Sepolia Testnet)
+    address public constant WETH = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9;
+    address public constant USDC = 0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
+    
+    // Fee percentage (0.1% = 10 basis points)
+    uint256 public constant FEE_BPS = 10;
 
     struct ArbitrageParams {
         address tokenIn;
@@ -82,8 +86,11 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
         _;
     }
 
-    constructor(address _lendingPool) {
+    constructor(address _lendingPool, address _feeCollector) {
+        require(_lendingPool != address(0), "Invalid lending pool address");
+        require(_feeCollector != address(0), "Invalid fee collector address");
         LENDING_POOL = ILendingPool(_lendingPool);
+        FEE_COLLECTOR = _feeCollector;
     }
 
     /**
@@ -149,6 +156,13 @@ contract FlashLoanArbitrage is IFlashLoanReceiver, ReentrancyGuard, Ownable {
         // Calculate total amount to repay (borrowed amount + fee)
         uint256 totalDebt = amounts[0] + premiums[0];
         require(profit > totalDebt, "Arbitrage not profitable");
+        
+        // Calculate and transfer fee to fee collector
+        uint256 netProfit = profit - totalDebt;
+        uint256 feeAmount = (netProfit * FEE_BPS) / 10000;
+        if (feeAmount > 0) {
+            IERC20(assets[0]).safeTransfer(FEE_COLLECTOR, feeAmount);
+        }
         
         // Approve lending pool to pull the debt amount
         IERC20(assets[0]).safeApprove(address(LENDING_POOL), totalDebt);

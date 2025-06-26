@@ -6,11 +6,12 @@ async function main() {
   // Get the contract factory
   const FlashLoanArbitrage = await ethers.getContractFactory("FlashLoanArbitrage");
 
-  // Aave V3 Pool address on Ethereum mainnet
-  const AAVE_POOL_ADDRESS = "0x87870Bca0Ce32Ac2e4e1d8F8a6F07e4Fb78c7c38";
+  // Aave V3 Pool address on Sepolia testnet
+  const AAVE_POOL_ADDRESS = "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A";
+  const FEE_COLLECTOR_ADDRESS = "0x5Cd87281B8Aec278136f1bC41173fBC69b1c0670";
 
-  // Deploy the contract
-  const flashLoanArbitrage = await FlashLoanArbitrage.deploy(AAVE_POOL_ADDRESS);
+  // Deploy the contract with fee collector
+  const flashLoanArbitrage = await FlashLoanArbitrage.deploy(AAVE_POOL_ADDRESS, FEE_COLLECTOR_ADDRESS);
 
   await flashLoanArbitrage.waitForDeployment();
 
@@ -18,6 +19,7 @@ async function main() {
 
   console.log("✅ FlashLoanArbitrage deployed to:", contractAddress);
   console.log("📋 Aave Pool Address:", AAVE_POOL_ADDRESS);
+  console.log("💰 Fee Collector Address:", FEE_COLLECTOR_ADDRESS);
 
   // Verify contract on Etherscan (if API key is provided)
   if (process.env.ETHERSCAN_API_KEY) {
@@ -28,7 +30,7 @@ async function main() {
     try {
       await hre.run("verify:verify", {
         address: contractAddress,
-        constructorArguments: [AAVE_POOL_ADDRESS],
+        constructorArguments: [AAVE_POOL_ADDRESS, FEE_COLLECTOR_ADDRESS],
       });
       console.log("✅ Contract verified on Etherscan");
     } catch (error) {

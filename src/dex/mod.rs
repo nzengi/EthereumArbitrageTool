@@ -1,7 +1,5 @@
 pub mod uniswap;
 pub mod sushiswap;
-pub mod curve;
-pub mod balancer;
 
 use anyhow::Result;
 use async_trait::async_trait;
