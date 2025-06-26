@@ -20,6 +20,10 @@ args = "Rust Arbitrage Bot"
 task = "workflow.run"
 args = "rust_build"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Contract Deployment Monitor"
+
 [[workflows.workflow]]
 name = "Rust Arbitrage Bot"
 author = "agent"
@@ -35,3 +39,11 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /tmp && git clone /tmp/project . && cd project && cargo build --release && echo \"Build completed successfully\""
+
+[[workflows.workflow]]
+name = "Contract Deployment Monitor"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx hardhat run scripts/deploy-direct.js --network sepolia"
