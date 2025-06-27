@@ -1,18 +1,41 @@
 {
-  "name": "workspace",
+  "name": "ethereum-arbitrage-tool",
   "version": "1.0.0",
-  "description": "A high-performance Rust-based arbitrage bot that executes flash loan arbitrage between multiple DEXes on Ethereum. The bot monitors price differences across Uniswap V2, SushiSwap, and Curve, then executes profitable arbitrage opportunities using Aave V3 flash loans.",
-  "main": "hardhat.config.js",
+  "description": "Ethereum Flash Loan Arbitrage Bot",
+  "main": "src/main.rs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy-flashloan.js --network sepolia",
+    "deploy:mainnet": "npx hardhat run scripts/deploy-mainnet.js --network mainnet",
+    "interact": "npx hardhat run scripts/interact-flashloan.js --network sepolia",
+    "verify": "npx hardhat run scripts/verify-contract.js --network sepolia",
+    "execute": "npx hardhat run scripts/execute-arbitrage.js --network sepolia",
+    "execute:mainnet": "npx hardhat run scripts/execute-small-capital.js --network mainnet",
+    "bot:start": "npx hardhat run scripts/continuous-arbitrage.js --network mainnet",
+    "bot:mev-boost": "npx hardhat run scripts/mev-boost-integration.js --network mainnet",
+    "test:arbitrage": "npx hardhat run scripts/test-arbitrage.js --network sepolia",
+    "monitor:mainnet": "npx hardhat run scripts/monitor-profits.js --network mainnet",
+    "clean": "npx hardhat clean"
   },
-  "keywords": [],
+  "keywords": [
+    "ethereum",
+    "arbitrage",
+    "flash-loan",
+    "defi",
+    "blockchain"
+  ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
-    "@openzeppelin/contracts": "^5.3.0",
-    "dotenv": "^16.5.0",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "hardhat": "^2.25.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.1",
+    "axios": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "eventsource": "^4.0.0",
+    "ws": "^8.18.2"
   }
 }

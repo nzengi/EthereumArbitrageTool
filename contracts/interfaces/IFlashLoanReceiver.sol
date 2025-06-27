@@ -2,6 +2,15 @@
 pragma solidity ^0.8.20;
 
 interface IFlashLoanReceiver {
+    /**
+     * @dev Executes an operation after receiving the flash-borrowed asset
+     * @param assets The addresses of the flash-borrowed assets
+     * @param amounts The amounts of the flash-borrowed assets
+     * @param premiums The fee of each flash-borrowed asset
+     * @param initiator The address of the flashloan initiator
+     * @param params The byte-encoded params passed when initiating the flashloan
+     * @return True if the execution of the operation succeeds, false otherwise
+     */
     function executeOperation(
         address[] calldata assets,
         uint256[] calldata amounts,

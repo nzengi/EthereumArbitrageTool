@@ -15,17 +15,46 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: process.env.ETHEREUM_RPC_URL || "https://sepolia.infura.io/v3/4bcf9d0577da4ecc8ce07d76ca8b94e0",
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace('0x', '')}`] : ["0xd9041cc00f04b3c131baa5dfaff3228f90689b71e4940b2bac0b5557de6d0fb2"],
+      url:
+        process.env.SEPOLIA_RPC_URL ||
+        "https://sepolia.infura.io/v3/YOUR_INFURA_KEY",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 20000000000, // 20 gwei
-      chainId: 11155111
+      chainId: 11155111,
+    },
+    mainnet: {
+      url:
+        process.env.MAINNET_RPC_URL ||
+        "https://mainnet.infura.io/v3/YOUR_INFURA_KEY",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 1000000000, // 1 gwei (ultra low cost)
+      gas: 2500000, // Conservative gas limit
+      timeout: 600000, // 10 minutes timeout for very low gas price
     },
     hardhat: {
-      chainId: 31337
+      chainId: 31337,
+      forking: {
+        url:
+          process.env.ETHEREUM_RPC_URL ||
+          "https://sepolia.infura.io/v3/4bcf9d0577da4ecc8ce07d76ca8b94e0",
+      },
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      sepolia: process.env.ETHERSCAN_API_KEY,
+      mainnet: process.env.ETHERSCAN_API_KEY,
+    },
+    customChains: [
+      {
+        network: "sepolia",
+        chainId: 11155111,
+        urls: {
+          apiURL: "https://api-sepolia.etherscan.io/api",
+          browserURL: "https://sepolia.etherscan.io",
+        },
+      },
+    ],
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
