@@ -1,173 +1,291 @@
-# Ethereum Flash Loan Arbitrage Bot
+# 🚀 Ethereum Flash Loan Arbitrage Tool
 
-A high-performance Rust-based arbitrage bot that executes flash loan arbitrage between multiple DEXes on Ethereum. The bot monitors price differences across Uniswap V2, SushiSwap, and Curve, then executes profitable arbitrage opportunities using Aave V3 flash loans.
+## 📋 Proje Hakkında
 
-## 🚀 Features
+Bu proje, Ethereum ağında DEX'ler arası fiyat farklarından yararlanarak arbitraj yapan gelişmiş bir flash loan arbitraj botudur. Aave V3 flash loan'ları kullanarak sıfır sermaye ile arbitraj işlemleri gerçekleştirir.
 
-- **Real-time DEX Price Monitoring**: Tracks prices across multiple DEXes
-- **Flash Loan Integration**: Uses Aave V3 for zero-capital arbitrage
-- **Gas Optimization**: Intelligent gas price management and MEV protection
-- **Risk Management**: Slippage protection and profitability validation
-- **High Performance**: Written in Rust for maximum execution speed
-- **Comprehensive Logging**: Detailed execution logs and statistics
+### ✨ Özellikler
 
-## 📋 Prerequisites
+- **Flash Loan Arbitrage**: Aave V3 protokolü ile sıfır sermaye arbitrajı
+- **Multi-DEX Support**: Uniswap V2, SushiSwap desteği
+- **MEV-Boost Integration**: Flashbots entegrasyonu ile gelişmiş kar optimizasyonu
+- **Real-time Monitoring**: Sürekli fiyat izleme ve otomatik işlem tetikleme
+- **Gas Optimization**: Düşük gas maliyeti ile optimize edilmiş işlemler
+- **Profit Tracking**: Kar takibi ve detaylı raporlama
 
-- Rust 1.70+ installed
-- Node.js 18+ (for smart contract deployment)
-- Ethereum wallet with ETH for gas fees
-- Infura or Alchemy RPC endpoint
-- Etherscan API key (optional, for contract verification)
+### 🎯 Desteklenen Ağlar
 
-## 🛠️ Installation
+- **Mainnet**: Üretim ortamı (önerilen)
+- **Sepolia Testnet**: Test ortamı
 
-1. **Clone the repository**:
+## 🛠 Kurulum
+
+### 1. Sistem Gereksinimleri
+
+- Node.js (v16 veya üzeri)
+- npm veya yarn
+- Git
+
+### 2. Projeyi İndirin
+
 ```bash
-git clone <repository-url>
-cd ethereum-flashloan-arbitrage-bot
-
-
-# Ethereum Flash Loan Arbitrage Bot
-
-## Overview
-
-This is a high-performance Rust-based arbitrage bot that executes flash loan arbitrage between multiple DEXes on Ethereum. The bot monitors price differences across Uniswap V2, SushiSwap, and Curve, then executes profitable trades using Aave V3 flash loans for zero-capital arbitrage. The system combines Rust's performance advantages with Solidity smart contracts for on-chain execution.
-
-## System Architecture
-
-The system follows a hybrid architecture combining:
-
-1. **Rust Backend**: High-performance bot logic for price monitoring, opportunity detection, and execution coordination
-2. **Smart Contract Layer**: Solidity contracts for flash loan execution and DEX interactions
-3. **Multi-DEX Integration**: Supports Uniswap V2, SushiSwap, and Curve protocols
-4. **Flash Loan Provider**: Integrates with Aave V3 for capital-efficient arbitrage
-
-### Key Architectural Decisions
-
-- **Rust for Performance**: Chosen for its low-latency capabilities and memory safety, critical for high-frequency arbitrage detection
-- **WebSocket Connections**: Real-time price monitoring through Ethereum WebSocket providers
-- **Modular DEX Design**: Abstract trait-based system allowing easy addition of new DEX protocols
-- **Flash Loan Integration**: Uses Aave V3 for maximum liquidity and lowest fees
-
-## Key Components
-
-### Core Modules
-
-1. **Arbitrage Detector** (`src/arbitrage/detector.rs`)
-   - Monitors price differences across multiple DEXes
-   - Identifies profitable opportunities above minimum thresholds
-   - Calculates gas costs and net profitability
-
-2. **Arbitrage Executor** (`src/arbitrage/executor.rs`)
-   - Executes profitable opportunities using flash loans
-   - Manages transaction flow and error handling
-   - Validates opportunities before execution
-
-3. **DEX Interfaces** (`src/dex/`)
-   - **Uniswap V2**: AMM-based price calculations and swap execution
-   - **SushiSwap**: Similar to Uniswap V2 with different router contracts
-   - **Curve**: Specialized for stablecoin and like-asset swaps
-
-4. **Flash Loan Provider** (`src/flashloan/aave.rs`)
-   - Integrates with Aave V3 lending pools
-   - Manages flash loan initiation and repayment
-   - Handles arbitrage execution within flash loan callback
-
-5. **Smart Contract** (`contracts/FlashLoanArbitrage.sol`)
-   - Implements Aave flash loan receiver interface
-   - Executes multi-DEX arbitrage in single transaction
-   - Includes reentrancy protection and access controls
-
-### Configuration System
-
-- Environment-based configuration through `.env` files
-- Supports multiple networks (mainnet, Goerli, Sepolia)
-- Configurable gas settings, profit thresholds, and risk parameters
-
-## Data Flow
-
-1. **Price Monitoring**: Bot continuously monitors DEX prices via WebSocket connections
-2. **Opportunity Detection**: Compares prices across DEXes to identify arbitrage opportunities
-3. **Profitability Analysis**: Calculates potential profit minus gas costs and flash loan fees
-4. **Execution**: If profitable, initiates flash loan and executes arbitrage through smart contract
-5. **Settlement**: Profits are automatically captured, flash loan is repaid, net profit retained
-
-### Transaction Flow
-
-```
-Flash Loan Request → Borrow Assets → Buy on Cheaper DEX → Sell on Expensive DEX → Repay Loan + Fee → Keep Profit
+git clone https://github.com/nzengi/EthereumArbitrageTool.git
+cd EthereumArbitrageTool
 ```
 
-## External Dependencies
+### 3. Bağımlılıkları Kurun
 
-### Blockchain Infrastructure
-- **Ethereum RPC Providers**: Infura/Alchemy for network connectivity
-- **WebSocket Connections**: Real-time blockchain data streaming
-- **Etherscan API**: Contract verification and gas price estimation
+```bash
+npm install
+```
 
-### DeFi Protocols
-- **Aave V3**: Flash loan provider (primary)
-- **Uniswap V2**: AMM DEX for token swaps
-- **SushiSwap**: Alternative AMM with similar interface
-- **Curve Finance**: Specialized for stablecoin arbitrage
+### 4. Environment Variables Ayarlayın
 
-### External APIs
-- **CoinGecko**: ETH price data for profit calculations
-- **Gas Station APIs**: Dynamic gas price optimization
+`.env` dosyası oluşturun ve aşağıdaki değişkenleri ekleyin:
 
-### Development Tools
-- **Hardhat**: Smart contract development and deployment
-- **OpenZeppelin**: Security-audited contract libraries
-- **Ethers.rs**: Ethereum interaction library for Rust
+```bash
+# .env dosyası
+# RPC URLs
+MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
 
-## Deployment Strategy
+# Private Key (0x olmadan)
+PRIVATE_KEY=your_private_key_here
 
-### Smart Contract Deployment
-1. Deploy flash loan arbitrage contract using Hardhat
-2. Verify contract on Etherscan for transparency
-3. Configure contract address in bot environment
+# Etherscan API Key (contract verification için)
+ETHERSCAN_API_KEY=your_etherscan_api_key
 
-### Bot Deployment
-1. Configure environment variables (RPC URLs, private keys, contract addresses)
-2. Set profitability thresholds and risk parameters
-3. Deploy on cloud infrastructure with low-latency network connections
-4. Monitor performance and adjust parameters based on market conditions
+# Opsiyonel API Keys (daha iyi fiyat verisi için)
+BINANCE_API_KEY=your_binance_api_key
+COINMARKETCAP_API_KEY=your_coinmarketcap_api_key
 
-### Security Considerations
-- **Private Key Management**: Environment-based key storage, consider hardware wallets for production
-- **MEV Protection**: Uses configurable MEV protection to avoid front-running
-- **Gas Price Optimization**: Dynamic gas pricing to ensure transaction inclusion
-- **Slippage Protection**: Configurable maximum slippage limits
+# Bot Configuration
+MIN_PROFIT_THRESHOLD=0.005  # ETH cinsinden minimum kar (varsayılan: ~$12)
+```
 
-## Changelog
-- June 26, 2025: Initial setup
-- June 26, 2025: Configured for Sepolia testnet with fee collection
-  - Added fee collector address: 0x5Cd87281B8Aec278136f1bC41173fBC69b1c0670
-  - Removed Curve and Balancer DEX support for testnet compatibility
-  - Updated smart contract with 0.1% fee mechanism
-  - Configured USDC and WETH addresses for Sepolia testnet
-- June 26, 2025: Smart contract successfully deployed
-  - Contract address: 0x0D2AfC2862b491e06467AF5dfeAd1f8e6037445E
-  - Deployed to Sepolia testnet with proper OpenZeppelin v5 compatibility
-  - Fixed compilation issues with viaIR compiler option
-  - Updated .env with deployed contract address
-- June 26, 2025: Rust arbitrage bot fully operational
-  - Resolved dependency conflicts with simplified dependencies
-  - Bot successfully monitoring DEX price differences
-  - Configured for 5-second monitoring intervals with 1% profit threshold
-  - System ready for mainnet deployment or real price monitoring integration
-- June 26, 2025: Real API integration completed
-  - Bot now fetches real ETH prices from CoinGecko API every minute
-  - Using curl-based HTTP requests for compatibility
-  - DEX price variations simulated realistically based on real ETH price
-  - Smart contract deployment pending - needs test ETH for gas fees
-  - System ready for production with live price data integration
-- June 26, 2025: Smart contract successfully deployed to Sepolia
-  - Contract deployed to address: 0x86B7c1b7F0a17a58737A50950059708e79Dc602d
-  - Bot updated with deployed contract address and restarted
-  - System now fully operational with real price monitoring and deployed contract
-  - Ready for live arbitrage execution when profitable opportunities arise
+### 5. Smart Contract'ı Derleyin
 
-## User Preferences
+```bash
+npm run compile
+```
 
-Preferred communication style: Simple, everyday language.
+## 🚀 Kullanım
+
+### Test Ağında Deneme (Sepolia)
+
+#### 1. Contract'ı Deploy Edin
+
+```bash
+npm run deploy
+```
+
+#### 2. Contract'ı Verify Edin (Opsiyonel)
+
+```bash
+npm run verify
+```
+
+#### 3. Test Arbitrajı Çalıştırın
+
+```bash
+npm run test:arbitrage
+```
+
+### Mainnet'te Üretim Kullanımı
+
+⚠️ **DİKKAT**: Mainnet'te gerçek para kullanılır. Önce test ağında deneyin!
+
+#### 1. Mainnet'e Deploy
+
+```bash
+npm run deploy:mainnet
+```
+
+#### 2. Bot'u Başlatın
+
+##### Standart Bot (Sürekli Çalışan)
+
+```bash
+npm run bot:start
+```
+
+##### MEV-Boost Entegre Bot (Önerilen)
+
+```bash
+npm run bot:mev-boost
+```
+
+#### 3. Kar Monitörü
+
+```bash
+npm run monitor:mainnet
+```
+
+## 📊 Bot Komutları
+
+### Temel Komutlar
+
+| Komut                     | Açıklama                  |
+| ------------------------- | ------------------------- |
+| `npm run compile`         | Smart contract'ları derle |
+| `npm run deploy`          | Sepolia'ya deploy et      |
+| `npm run deploy:mainnet`  | Mainnet'e deploy et       |
+| `npm run bot:start`       | Ana botu başlat           |
+| `npm run bot:mev-boost`   | MEV-Boost entegre bot     |
+| `npm run execute:mainnet` | Tek seferlik arbitraj     |
+| `npm run monitor:mainnet` | Kar monitörü              |
+
+### Gelişmiş Komutlar
+
+| Komut                         | Açıklama                   |
+| ----------------------------- | -------------------------- |
+| `npm run rbuilder:setup`      | rbuilder ortamını kur      |
+| `npm run rbuilder:start`      | rbuilder'ı başlat          |
+| `npm run rbuilder:production` | Üretim anahtarları oluştur |
+
+## 💰 Karlılık ve Stratejiler
+
+### Başlangıç Sermayesi Önerileri
+
+#### Küçük Sermaye (1 ETH borç)
+
+- **Hedef**: Günde $20 kar
+- **Min Kar Eşiği**: 0.005 ETH (~$12)
+- **İşlem Sıklığı**: Günde 2-3 işlem
+- **Risk**: Düşük
+
+#### Orta Sermaye (5 ETH borç)
+
+- **Hedef**: Günde $50 kar
+- **Min Kar Eşiği**: 0.02 ETH (~$50)
+- **İşlem Sıklığı**: Günde 1-2 işlem
+- **Risk**: Orta
+
+### Maliyet Hesaplaması
+
+```
+Total Cost = Aave Fee (0.09%) + Gas Fee + Bot Fee (0.1% of profit)
+
+Örnek 1 ETH borrowing:
+- Aave Fee: 0.0009 ETH (~$2.16)
+- Gas Fee: ~0.001 ETH (~$2.40) (1-2 Gwei ile)
+- Bot Fee: Sadece kar üzerinden %0.1
+```
+
+## 🔒 Güvenlik
+
+### Smart Contract Güvenliği
+
+- **Owner-only Functions**: Sadece owner işlem yapabilir
+- **Reentrancy Protection**: Yeniden girme saldırılarına karşı korunmalı
+- **Emergency Withdraw**: Acil durum fonları çekme
+- **Audited Code**: OpenZeppelin standartları
+
+### Operasyonel Güvenlik
+
+- **Private Key**: Asla paylaşmayın, güvenli saklayın
+- **Test First**: Önce testnet'te deneyin
+- **Monitor Regularly**: Sürekli monitör edin
+- **Profit Limits**: Kar limitlerini ayarlayın
+
+## 📈 Monitoring ve Analytics
+
+### Real-time Monitoring
+
+Bot çalışırken göreceğiniz çıktı örneği:
+
+```
+🚀 Starting Flash Loan Arbitrage Bot...
+📊 Configuration:
+   - Network: mainnet
+   - Min Profit: 0.005 ETH
+   - Gas Price: 1 Gwei
+   - Contract: 0x2Ec4D7102ab6863aEef44d140Af01CB667eD5DAa
+
+💰 Scanning for opportunities...
+📊 ETH Price: $2,400.50
+   - Uniswap: $2,398.20
+   - SushiSwap: $2,403.80
+   - Difference: 0.23% ($5.60)
+
+🔍 Opportunity found! Potential profit: 0.008 ETH ($19.20)
+⚡ Executing arbitrage...
+✅ Transaction successful! Profit: 0.0067 ETH ($16.08)
+```
+
+### Profit Reports
+
+```bash
+# Günlük kar raporu
+npm run monitor:mainnet
+
+# Çıktı örneği:
+📊 Daily Profit Report:
+   - Total Profit: 0.045 ETH ($108.00)
+   - Successful Trades: 7
+   - Failed Trades: 2
+   - Success Rate: 77.8%
+   - Gas Spent: 0.012 ETH ($28.80)
+   - Net Profit: 0.033 ETH ($79.20)
+```
+
+## 🛠 Troubleshooting
+
+### Yaygın Sorunlar
+
+#### 1. "Transaction failed" hatası
+
+```bash
+# Gas limit'i artırın
+export GAS_LIMIT=3000000
+npm run bot:start
+```
+
+#### 2. "Insufficient funds" hatası
+
+```bash
+# Cüzdan bakiyenizi kontrol edin
+# En az 0.1 ETH gas fee için gerekli
+```
+
+#### 3. "Rate limit exceeded" hatası
+
+```bash
+# API key'lerinizi .env dosyasına ekleyin
+# Veya farklı RPC provider kullanın
+```
+
+### Debug Modu
+
+```bash
+# Detaylı loglar için
+DEBUG=true npm run bot:start
+
+# Sadece hata logları için
+LOG_LEVEL=error npm run bot:start
+```
+
+## 🤝 Katkıda Bulunma
+
+1. Fork'layın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit'leyin (`git commit -m 'Add amazing feature'`)
+4. Branch'i push'layın (`git push origin feature/amazing-feature`)
+5. Pull Request açın
+
+## 📄 Lisans
+
+Bu proje ISC lisansı altında lisanslanmıştır.
+
+## ⚠️ Feragatname
+
+Bu yazılım eğitim amaçlıdır. Gerçek parayla kullanımdan kaynaklanan zararlardan sorumlu değiliz. Lütfen kendi riskinizi değerlendirin ve sadece kaybetmeyi göze alabileceğiniz miktarla işlem yapın.
+
+## 📞 Destek
+
+- **GitHub Issues**: Bug raporu ve feature istekleri için
+- **Documentation**: `/docs` klasöründe detaylı dökümantasyon
+
+---
+
+**🔥 Happy Arbitraging! 🔥**
