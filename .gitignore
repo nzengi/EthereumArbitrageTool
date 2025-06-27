@@ -1,0 +1,139 @@
+# ======================================
+# ETHEREUM ARBITRAGE TOOL - GITIGNORE
+# ======================================
+
+# 🔐 SENSITIVE FILES - NEVER COMMIT!
+# ===================================
+.env
+.env.local
+.env.production
+.env.development
+*.pem
+*.key
+private-keys.txt
+mnemonic.txt
+wallet.json
+keystore/
+
+# 💰 DEPLOYMENT & TRANSACTION DATA
+# =================================
+deployments/*.json
+logs/
+successful-trades.json
+failed-trades.json
+arbitrage-history.json
+
+# 📦 NODE.JS DEPENDENCIES
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# 🔨 HARDHAT BUILD ARTIFACTS
+# ===========================
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+.openzeppelin/
+
+# 🦀 RUST BUILD ARTIFACTS (if any)
+# =================================
+target/
+Cargo.lock
+**/*.rs.bk
+
+# 💻 IDE & EDITOR FILES
+# =====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 📊 LOGS & TEMPORARY FILES
+# =========================
+*.log
+tmp/
+temp/
+.tmp/
+.temp/
+
+# 🧪 TESTING FILES
+# =================
+.nyc_output
+test-results/
+playwright-report/
+test-report.html
+
+# 📱 SYSTEM FILES
+# ================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 🌐 NETWORK SPECIFIC
+# ====================
+.env.mainnet
+.env.sepolia
+.env.goerli
+rpc-urls.txt
+infura-keys.txt
+alchemy-keys.txt
+
+# 📈 ANALYTICS & MONITORING
+# ==========================
+gas-reports/
+profit-reports/
+performance-logs/
+monitoring-data/
+
+# 🔧 BUILD & DIST
+# ================
+dist/
+build/
+out/
+
+# 📚 DOCUMENTATION TEMP
+# ======================
+docs/temp/
+*.tmp.md
+
+# 🎯 PROJECT SPECIFIC
+# ====================
+# Backup files
+*.backup
+*.bak
+
+# Local configuration
+local.config.js
+local.settings.json
+
+# API keys and secrets
+api-keys.txt
+secrets.json
+credentials.json
+
+# Database files (if any)
+*.db
+*.sqlite
+*.sqlite3
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar
+
+# ======================================
+# END OF GITIGNORE
+# ====================================== 
