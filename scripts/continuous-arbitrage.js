@@ -8,9 +8,17 @@ const MAINNET_ADDRESSES = {
   WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
   USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   DAI: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+  USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
   UNISWAP_ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
   SUSHISWAP_ROUTER: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
 };
+
+// Token pairs to check for arbitrage
+const TOKEN_PAIRS = [
+  { tokenA: "WETH", tokenB: "USDC", name: "WETH/USDC" },
+  { tokenA: "WETH", tokenB: "USDT", name: "WETH/USDT" },
+  { tokenA: "WETH", tokenB: "DAI", name: "WETH/DAI" },
+];
 
 // Strategy configuration
 const STRATEGY_CONFIG = {
@@ -83,11 +91,14 @@ async function checkDailyLimits() {
   };
 }
 
-async function calculateArbitrageOpportunity(contract, prices) {
+async function calculateArbitrageOpportunity(contract, prices, tokenPair) {
   try {
+    const tokenAAddress = MAINNET_ADDRESSES[tokenPair.tokenA];
+    const tokenBAddress = MAINNET_ADDRESSES[tokenPair.tokenB];
+
     const [profit, profitable] = await contract.calculateArbitrageProfit(
-      MAINNET_ADDRESSES.WETH,
-      MAINNET_ADDRESSES.USDC,
+      tokenAAddress,
+      tokenBAddress,
       STRATEGY_CONFIG.borrowAmounts.WETH,
       MAINNET_ADDRESSES.UNISWAP_ROUTER,
       MAINNET_ADDRESSES.SUSHISWAP_ROUTER
@@ -109,11 +120,20 @@ async function calculateArbitrageOpportunity(contract, prices) {
     const netProfitUSD =
       profitInUSD - aaveFee * prices.ETH - ourFee - gasCostUSD;
 
+    // Calculate profit percentage
+    const investmentUSD = borrowAmountInETH * prices.ETH; // 1 ETH in USD
+    const profitPercentage = (netProfitUSD / investmentUSD) * 100;
+
     return {
-      profitable: profitable && netProfitUSD >= 5, // Minimum $5 net profit
+      profitable: profitable && profitPercentage >= 0.3, // Minimum %0.30 karlılık
       grossProfitUSD: profitInUSD,
       netProfitUSD: netProfitUSD,
       profitInETH: profitInETH,
+      profitPercentage: profitPercentage,
+      investmentUSD: investmentUSD,
+      tokenPair: tokenPair,
+      tokenAAddress: tokenAAddress,
+      tokenBAddress: tokenBAddress,
       fees: {
         aave: aaveFee * prices.ETH,
         our: ourFee,
@@ -132,8 +152,8 @@ async function executeArbitrage(contract, opportunity, prices) {
     console.log(`💰 Beklenen Net Kar: $${opportunity.netProfitUSD.toFixed(2)}`);
 
     const arbitrageParams = {
-      tokenA: MAINNET_ADDRESSES.WETH,
-      tokenB: MAINNET_ADDRESSES.USDC,
+      tokenA: opportunity.tokenAAddress,
+      tokenB: opportunity.tokenBAddress,
       amountIn: STRATEGY_CONFIG.borrowAmounts.WETH,
       router1: MAINNET_ADDRESSES.UNISWAP_ROUTER,
       router2: MAINNET_ADDRESSES.SUSHISWAP_ROUTER,
@@ -173,7 +193,7 @@ async function executeArbitrage(contract, opportunity, prices) {
     );
 
     const tx = await contract.startArbitrage(
-      MAINNET_ADDRESSES.WETH,
+      opportunity.tokenAAddress, // Use the token from the opportunity
       STRATEGY_CONFIG.borrowAmounts.WETH,
       encodedParams,
       {
@@ -272,7 +292,7 @@ async function monitoringCycle() {
     const [signer] = await ethers.getSigners();
     const balance = await ethers.provider.getBalance(signer.address);
 
-    if (balance < ethers.parseEther("0.01")) {
+    if (balance < ethers.parseEther("0.0001")) {
       console.log("❌ Yetersiz ETH bakiye! En az 0.01 ETH gerekli.");
       return;
     }
@@ -286,37 +306,73 @@ async function monitoringCycle() {
     const prices = await fetchCurrentPrices();
     console.log(`💰 ETH Fiyatı: $${prices.ETH}`);
 
-    // Check arbitrage opportunity
-    const opportunity = await calculateArbitrageOpportunity(contract, prices);
+    // Check arbitrage opportunities for all token pairs
+    let bestOpportunity = null;
 
-    if (opportunity.profitable) {
-      console.log("🎉 KARLI ARBITRAJ FIRSATI BULUNDU!");
-      console.log(`💹 Brüt Kar: $${opportunity.grossProfitUSD.toFixed(2)}`);
-      console.log(`💎 Net Kar: $${opportunity.netProfitUSD.toFixed(2)}`);
+    for (const tokenPair of TOKEN_PAIRS) {
+      console.log(`🔍 ${tokenPair.name} çifti kontrol ediliyor...`);
+
+      const opportunity = await calculateArbitrageOpportunity(
+        contract,
+        prices,
+        tokenPair
+      );
+
+      if (opportunity.profitable) {
+        if (
+          !bestOpportunity ||
+          opportunity.profitPercentage > bestOpportunity.profitPercentage
+        ) {
+          bestOpportunity = opportunity;
+        }
+        console.log(
+          `✅ ${tokenPair.name}: %${opportunity.profitPercentage.toFixed(
+            3
+          )} karlılık`
+        );
+      } else {
+        if (opportunity.profitPercentage > 0) {
+          console.log(
+            `❌ ${tokenPair.name}: %${opportunity.profitPercentage.toFixed(
+              3
+            )} (yetersiz)`
+          );
+        } else {
+          console.log(`❌ ${tokenPair.name}: Kar yok`);
+        }
+      }
+    }
+
+    if (bestOpportunity) {
+      console.log("\n🎉 EN İYİ ARBITRAJ FIRSATI BULUNDU!");
+      console.log(`🏆 Token Çifti: ${bestOpportunity.tokenPair.name}`);
+      console.log(`💹 Brüt Kar: $${bestOpportunity.grossProfitUSD.toFixed(2)}`);
+      console.log(`💎 Net Kar: $${bestOpportunity.netProfitUSD.toFixed(2)}`);
       console.log(
-        `💸 Fees: Aave $${opportunity.fees.aave.toFixed(
+        `📊 Karlılık: %${bestOpportunity.profitPercentage.toFixed(
+          3
+        )} (min %0.30)`
+      );
+      console.log(`💰 Yatırım: $${bestOpportunity.investmentUSD.toFixed(2)}`);
+      console.log(
+        `💸 Fees: Aave $${bestOpportunity.fees.aave.toFixed(
           2
-        )}, Our $${opportunity.fees.our.toFixed(
+        )}, Our $${bestOpportunity.fees.our.toFixed(
           2
-        )}, Gas $${opportunity.fees.gas.toFixed(2)}`
+        )}, Gas $${bestOpportunity.fees.gas.toFixed(2)}`
       );
 
       // Execute arbitrage
-      const success = await executeArbitrage(contract, opportunity, prices);
+      const success = await executeArbitrage(contract, bestOpportunity, prices);
 
       if (success) {
         console.log(`🎯 Toplam başarılı işlem: ${successfulTrades}`);
         console.log(`💰 Toplam kar: $${totalProfit.toFixed(2)}`);
       }
     } else {
-      console.log("😴 Karlı arbitraj fırsatı yok. Beklemeye devam...");
-      if (opportunity.netProfitUSD > 0) {
-        console.log(
-          `💡 Net kar çok düşük: $${opportunity.netProfitUSD.toFixed(
-            2
-          )} (min $5 gerekli)`
-        );
-      }
+      console.log(
+        "\n😴 Hiçbir token çiftinde karlı arbitraj fırsatı yok. Beklemeye devam..."
+      );
     }
   } catch (error) {
     console.error(`❌ Monitoring cycle hatası: ${error.message}`);
@@ -334,7 +390,7 @@ async function startContinuousMonitoring() {
   console.log(
     `🔄 Max Günlük İşlem: ${STRATEGY_CONFIG.dailyTargets.maxTradesPerDay}`
   );
-  console.log(`💸 Min Net Kar: $5`);
+  console.log(`💸 Min Karlılık: %0.30`);
   console.log(
     "📊 Bot otomatik olarak karlı fırsatları tespit edip işlem yapacak...\n"
   );

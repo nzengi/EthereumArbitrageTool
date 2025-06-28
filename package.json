@@ -13,6 +13,7 @@
     "execute": "npx hardhat run scripts/execute-arbitrage.js --network sepolia",
     "execute:mainnet": "npx hardhat run scripts/execute-small-capital.js --network mainnet",
     "bot:start": "npx hardhat run scripts/continuous-arbitrage.js --network mainnet",
+    "ultra-bot": "npx hardhat run scripts/ultra-arbitrage-bot.js --network mainnet",
     "bot:mev-boost": "npx hardhat run scripts/mev-boost-integration.js --network mainnet",
     "rbuilder:start": "node scripts/start-rbuilder.js",
     "rbuilder:setup": "node scripts/setup-rbuilder-env.js",

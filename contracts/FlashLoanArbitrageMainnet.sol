@@ -32,7 +32,7 @@ interface IUniswapV2Router {
     function WETH() external pure returns (address);
 }
 
-contract FlashLoanArbitrageMainnet is ReentrancyGuard, Ownable {
+contract FlashLoanArbitrageMainnet is ReentrancyGuard, Ownable, IFlashLoanReceiver {
     using SafeERC20 for IERC20;
 
     // Aave V3 Pool Address (Mainnet)
