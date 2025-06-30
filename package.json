@@ -14,12 +14,14 @@
     "execute:mainnet": "npx hardhat run scripts/execute-small-capital.js --network mainnet",
     "bot:start": "npx hardhat run scripts/continuous-arbitrage.js --network mainnet",
     "ultra-bot": "npx hardhat run scripts/ultra-arbitrage-bot.js --network mainnet",
+    "enhanced-bot": "npx hardhat run scripts/enhanced-ultra-bot.js --network mainnet",
     "bot:mev-boost": "npx hardhat run scripts/mev-boost-integration.js --network mainnet",
     "rbuilder:start": "node scripts/start-rbuilder.js",
     "rbuilder:setup": "node scripts/setup-rbuilder-env.js",
     "rbuilder:production": "node scripts/generate-production-keys.js",
     "test:arbitrage": "npx hardhat run scripts/test-arbitrage.js --network sepolia",
     "monitor:mainnet": "npx hardhat run scripts/monitor-profits.js --network mainnet",
+    "check-api": "node scripts/check-api-setup.js",
     "clean": "npx hardhat clean"
   },
   "keywords": [
